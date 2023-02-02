@@ -51,10 +51,8 @@ suppliers_w_geo as (
 ),
 
 
--- i am not sure why customers are being dropped on the join bc, from spot checking, it looks like it should be working.
--- will look into it more if i have time!
 customers_w_geo as (
-    -- 1.8k 
+    -- 2,401k
     select 
         customers.*,
         geo.geo_location as customer_geo
