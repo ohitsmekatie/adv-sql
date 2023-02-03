@@ -1,5 +1,4 @@
 
-
 with customers as (
     -- 10k total customers 
     select 
@@ -16,7 +15,6 @@ with customers as (
         on customer_data.customer_id = customer_address.customer_id 
 ),
 
-
 suppliers as (
     -- 10
     select 
@@ -28,7 +26,6 @@ suppliers as (
     from vk_data.suppliers.supplier_info
 ),
 
-
 geo as (
     select 
         -- lowercasing city and states so they can be joined later and adding trim just to be safe because of the other datasets
@@ -37,7 +34,6 @@ geo as (
         geo_location
     from vk_data.resources.us_cities
 ),
-
 
 suppliers_w_geo as (
     -- 10
@@ -50,9 +46,7 @@ suppliers_w_geo as (
         and suppliers.supplier_state_abbr = geo.state_abbr 
 ),
 
-
 customers_w_geo as (
-    -- 2,401k
     select 
         customers.*,
         geo.geo_location as customer_geo
@@ -61,7 +55,6 @@ customers_w_geo as (
         on customers.customer_city = geo.city_name
         and customers.customer_state_abbr = geo.state_abbr
 ),
-
 
 calc_distance as (
     select 
@@ -72,14 +65,12 @@ calc_distance as (
     cross join suppliers_w_geo
 ),
 
-
 rank as (
     select 
         *,
     rank() over (partition by customer_id order by shipping_distance_miles) as shipping_distance_ranked
     from calc_distance 
 ),
-
 
 final as (
     select 
