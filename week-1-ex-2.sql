@@ -44,7 +44,6 @@ eligible_survey_customers as (
         on customers_w_geo.customer_id = customer_survey.customer_id 
     where 
         customer_survey.is_active = True 
-
 ),
 
 customer_tags as (
