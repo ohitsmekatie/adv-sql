@@ -1,14 +1,14 @@
 -- creating an unpacked events CTE to be used throughout the rest of the query 
 with events as (
-	select 
-    	event_id,
-        session_id,
-        user_id,
-        event_timestamp,
-        -- https://docs.snowflake.com/en/sql-reference/functions/parse_json
-        -- cast as a string to remove quotes from extracting the json 
-        parse_json(event_details):event::string as event,
-        parse_json(event_details):recipe_id::string as recipe_id        
+    select 
+	event_id,
+	session_id,
+	user_id,
+	event_timestamp,
+	-- https://docs.snowflake.com/en/sql-reference/functions/parse_json
+	-- cast as a string to remove quotes from extracting the json 
+	parse_json(event_details):event::string as event,
+	parse_json(event_details):recipe_id::string as recipe_id        
     from vk_data.events.website_activity 
     -- for de-duplicating events 
     group by 1,2,3,4,5,6
@@ -16,25 +16,25 @@ with events as (
 
 -- for each session_id, getting the min/max for start & end times to use as average later 
 daily_session_metrics as (
-	select 
-    	date(event_timestamp) as event_day,
-    	session_id,
-        min(event_timestamp) as session_start,
-        max(event_timestamp) as session_end,
-        timestampdiff('seconds', session_start, session_end) as session_length_in_seconds,
-        -- using nullifzero so that i can divide these later to get the ratio of search to view per day. division by 0 error otherwise 
-        nullifzero(count_if(event = 'search')) as num_search_events,
-        nullifzero(count_if(event = 'view_recipe' )) as num_recipe_views 
+    select 
+	date(event_timestamp) as event_day,
+	session_id,
+	min(event_timestamp) as session_start,
+	max(event_timestamp) as session_end,
+	timestampdiff('seconds', session_start, session_end) as session_length_in_seconds,
+	-- using nullifzero so that i can divide these later to get the ratio of search to view per day. division by 0 error otherwise 
+	nullifzero(count_if(event = 'search')) as num_search_events,
+	nullifzero(count_if(event = 'view_recipe' )) as num_recipe_views 
     from events 
     group by 1,2
 ),
 
 -- gets the top recipe per day with the total number of views 
 daily_top_recipe as (
-	select 
-    	date(event_timestamp) as event_day,
-    	recipe_id,
-        count(*) as num_views
+    select 
+	date(event_timestamp) as event_day,
+	recipe_id,
+	count(*) as num_views
     from events 
     where recipe_id is not null 
     group by 1,2
