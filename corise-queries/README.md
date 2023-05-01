@@ -1,3 +1,3 @@
-# CoRise advanced SQL queries
+# A collection of SQL queries
 
-A collection of queries from the CoRise Advanced SQL course.
+A collection of query examples to help illustrate skill level. 
